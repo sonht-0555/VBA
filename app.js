@@ -389,18 +389,30 @@ loadButton.addEventListener('click', async function() {
     Module._emuLoadState(loadStateBufferPtr, dataSize);
     Module._free(loadStateBufferPtr);
 });
-function loadfile() {
-    indexedDB.open('/data').onsuccess = (e) => {
+indexedDB.open('/data').onsuccess = (e) => {
+    const db = e.target.result;
+    const range = IDBKeyRange.bound('/data/states/', '/data/states/' + '\uffff');
+    db.transaction('FILE_DATA', 'readonly').objectStore('FILE_DATA').openCursor(range).onsuccess = (e) => {
+        const cursor = e.target.result;
+        if (cursor) {
+        const key = cursor.key;
+        console.log(key.substring(key.lastIndexOf('/') + 1));
+        cursor.continue();
+        }
+    };
+    };
+function create() {
+    const request = indexedDB.open('/data', 1); // Tạo hoặc mở cơ sở dữ liệu với version 1
+
+    request.onupgradeneeded = (e) => {
         const db = e.target.result;
-        const range = IDBKeyRange.bound('/data/states/', '/data/states/' + '\uffff');
-        db.transaction('FILE_DATA', 'readonly').objectStore('FILE_DATA').openCursor(range).onsuccess = (e) => {
-          const cursor = e.target.result;
-          if (cursor) {
-            const key = cursor.key;
-            console.log(key.substring(key.lastIndexOf('/') + 1));
-            cursor.continue();
-          }
-        };
-      };
+        if (!db.objectStoreNames.contains('FILE_DATA')) {
+            db.createObjectStore('FILE_DATA'); // Tạo object store nếu chưa tồn tại
+        }
+    };
+    request.onerror = (err) => {
+        console.error('Error opening IndexedDB:', err);
+    };
 }
+create();
 //----------------------------------------------------------------------------------------------------------------------
