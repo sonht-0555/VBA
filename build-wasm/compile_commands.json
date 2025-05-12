@@ -1,0 +1,37 @@
+[
+{
+  "directory": "/home/vba/build-wasm",
+  "command": "/emsdk/upstream/emscripten/em++ -DFRONTEND_SUPPORTS_RGB565 -DHAVE_STDINT_H -DINLINE=inline -DLSB_FIRST -DUSE_CHEATS=1 -DUSE_KEYBOARD -DUSE_STATIC_WRAM @CMakeFiles/vba.dir/includes_CXX.rsp -O3 -DNDEBUG -flto -O3 -sUSE_SDL=2 -o CMakeFiles/vba.dir/main.cpp.o -c /home/vba/main.cpp",
+  "file": "/home/vba/main.cpp"
+},
+{
+  "directory": "/home/vba/build-wasm",
+  "command": "/emsdk/upstream/emscripten/em++ -DFRONTEND_SUPPORTS_RGB565 -DHAVE_STDINT_H -DINLINE=inline -DLSB_FIRST -DUSE_CHEATS=1 -DUSE_KEYBOARD -DUSE_STATIC_WRAM @CMakeFiles/vba.dir/includes_CXX.rsp -O3 -DNDEBUG -flto -O3 -sUSE_SDL=2 -o CMakeFiles/vba.dir/src/gba.cpp.o -c /home/vba/src/gba.cpp",
+  "file": "/home/vba/src/gba.cpp"
+},
+{
+  "directory": "/home/vba/build-wasm",
+  "command": "/emsdk/upstream/emscripten/em++ -DFRONTEND_SUPPORTS_RGB565 -DHAVE_STDINT_H -DINLINE=inline -DLSB_FIRST -DUSE_CHEATS=1 -DUSE_KEYBOARD -DUSE_STATIC_WRAM @CMakeFiles/vba.dir/includes_CXX.rsp -O3 -DNDEBUG -flto -O3 -sUSE_SDL=2 -o CMakeFiles/vba.dir/src/memory.cpp.o -c /home/vba/src/memory.cpp",
+  "file": "/home/vba/src/memory.cpp"
+},
+{
+  "directory": "/home/vba/build-wasm",
+  "command": "/emsdk/upstream/emscripten/em++ -DFRONTEND_SUPPORTS_RGB565 -DHAVE_STDINT_H -DINLINE=inline -DLSB_FIRST -DUSE_CHEATS=1 -DUSE_KEYBOARD -DUSE_STATIC_WRAM @CMakeFiles/vba.dir/includes_CXX.rsp -O3 -DNDEBUG -flto -O3 -sUSE_SDL=2 -o CMakeFiles/vba.dir/src/sound.cpp.o -c /home/vba/src/sound.cpp",
+  "file": "/home/vba/src/sound.cpp"
+},
+{
+  "directory": "/home/vba/build-wasm",
+  "command": "/emsdk/upstream/emscripten/em++ -DFRONTEND_SUPPORTS_RGB565 -DHAVE_STDINT_H -DINLINE=inline -DLSB_FIRST -DUSE_CHEATS=1 -DUSE_KEYBOARD -DUSE_STATIC_WRAM @CMakeFiles/vba.dir/includes_CXX.rsp -O3 -DNDEBUG -flto -O3 -sUSE_SDL=2 -o CMakeFiles/vba.dir/src/system.cpp.o -c /home/vba/src/system.cpp",
+  "file": "/home/vba/src/system.cpp"
+},
+{
+  "directory": "/home/vba/build-wasm",
+  "command": "/emsdk/upstream/emscripten/em++ -DFRONTEND_SUPPORTS_RGB565 -DHAVE_STDINT_H -DINLINE=inline -DLSB_FIRST -DUSE_CHEATS=1 -DUSE_KEYBOARD -DUSE_STATIC_WRAM @CMakeFiles/vba.dir/includes_CXX.rsp -O3 -DNDEBUG -flto -O3 -sUSE_SDL=2 -o CMakeFiles/vba.dir/src/ui.cpp.o -c /home/vba/src/ui.cpp",
+  "file": "/home/vba/src/ui.cpp"
+},
+{
+  "directory": "/home/vba/build-wasm",
+  "command": "/emsdk/upstream/emscripten/em++ -DFRONTEND_SUPPORTS_RGB565 -DHAVE_STDINT_H -DINLINE=inline -DLSB_FIRST -DUSE_CHEATS=1 -DUSE_KEYBOARD -DUSE_STATIC_WRAM @CMakeFiles/vba.dir/includes_CXX.rsp -O3 -DNDEBUG -flto -O3 -sUSE_SDL=2 -o CMakeFiles/vba.dir/libretro/libretro.cpp.o -c /home/vba/libretro/libretro.cpp",
+  "file": "/home/vba/libretro/libretro.cpp"
+}
+]
