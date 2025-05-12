@@ -353,21 +353,59 @@ let currentSaveStateInMemory = null;
 const saveButton = document.getElementById('saveStateButton');
 const loadButton = document.getElementById('loadStateButton');
 
-// Gán trình lắng nghe sự kiện click cho nút SAVE
+// Hàm ghi dữ liệu vào IndexedDB
+function writeToIndexedDB(dbName, storeName, key, data) {
+    const request = indexedDB.open(dbName);
+    request.onsuccess = (e) => {
+        const db = e.target.result;
+        const transaction = db.transaction(storeName, 'readwrite');
+        const store = transaction.objectStore(storeName);
+        store.put(data, key);
+    };
+}
+
+// Hàm đọc dữ liệu từ IndexedDB
+function readFromIndexedDB(dbName, storeName, key) {
+    return new Promise((resolve) => {
+        const request = indexedDB.open(dbName);
+        request.onsuccess = (e) => {
+            const db = e.target.result;
+            const transaction = db.transaction(storeName, 'readonly');
+            const store = transaction.objectStore(storeName);
+            const getRequest = store.get(key);
+            getRequest.onsuccess = (e) => resolve(e.target.result);
+        };
+    });
+}
+
+// Sử dụng các hàm trên cho saveButton và loadButton
 saveButton.addEventListener('click', function() {
     const saveStateBufferPtr = Module._malloc(2000000);
     const actualSize = Module._emuSaveState(saveStateBufferPtr, 2000000);
     const saveStateDataCopy = new Uint8Array(Module.HEAPU8.buffer, saveStateBufferPtr, actualSize).slice();
-    currentSaveStateInMemory = saveStateDataCopy;
     Module._free(saveStateBufferPtr);
+    writeToIndexedDB('/data', 'FILE_DATA', '/data/states/game.ss1', saveStateDataCopy);
 });
 
-// Gán trình lắng nghe sự kiện click cho nút LOAD
-loadButton.addEventListener('click', function() {
-    const dataSize = currentSaveStateInMemory.length;
+loadButton.addEventListener('click', async function() {
+    const saveStateData = await readFromIndexedDB('/data', 'FILE_DATA', '/data/states/game.ss1');
+    const dataSize = saveStateData.length;
     const loadStateBufferPtr = Module._malloc(dataSize);
-    Module.HEAPU8.set(currentSaveStateInMemory, loadStateBufferPtr);
+    Module.HEAPU8.set(saveStateData, loadStateBufferPtr);
     Module._emuLoadState(loadStateBufferPtr, dataSize);
     Module._free(loadStateBufferPtr);
 });
+
+indexedDB.open('/data').onsuccess = (e) => {
+  const db = e.target.result;
+  const range = IDBKeyRange.bound('/data/states/', '/data/states/' + '\uffff');
+  db.transaction('FILE_DATA', 'readonly').objectStore('FILE_DATA').openCursor(range).onsuccess = (e) => {
+    const cursor = e.target.result;
+    if (cursor) {
+      const key = cursor.key;
+      console.log(key.substring(key.lastIndexOf('/') + 1));
+      cursor.continue();
+    }
+  };
+};
 //----------------------------------------------------------------------------------------------------------------------
