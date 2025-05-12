@@ -389,17 +389,18 @@ loadButton.addEventListener('click', async function() {
     Module._emuLoadState(loadStateBufferPtr, dataSize);
     Module._free(loadStateBufferPtr);
 });
-
-indexedDB.open('/data').onsuccess = (e) => {
-  const db = e.target.result;
-  const range = IDBKeyRange.bound('/data/states/', '/data/states/' + '\uffff');
-  db.transaction('FILE_DATA', 'readonly').objectStore('FILE_DATA').openCursor(range).onsuccess = (e) => {
-    const cursor = e.target.result;
-    if (cursor) {
-      const key = cursor.key;
-      console.log(key.substring(key.lastIndexOf('/') + 1));
-      cursor.continue();
-    }
-  };
-};
+function loadfile() {
+    indexedDB.open('/data').onsuccess = (e) => {
+        const db = e.target.result;
+        const range = IDBKeyRange.bound('/data/states/', '/data/states/' + '\uffff');
+        db.transaction('FILE_DATA', 'readonly').objectStore('FILE_DATA').openCursor(range).onsuccess = (e) => {
+          const cursor = e.target.result;
+          if (cursor) {
+            const key = cursor.key;
+            console.log(key.substring(key.lastIndexOf('/') + 1));
+            cursor.continue();
+          }
+        };
+      };
+}
 //----------------------------------------------------------------------------------------------------------------------
