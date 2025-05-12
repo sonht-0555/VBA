@@ -1,0 +1,9 @@
+brew update
+brew install colima docker
+colima start
+docker version
+git clone vba...
+cd docker
+docker build -t local-vba/wasm:1.1 .
+cd ./../
+docker run --rm -t -v $PWD:/home/vba local-vba/wasm:1.1
