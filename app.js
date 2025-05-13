@@ -99,6 +99,21 @@ function wasmReady() {
     idata = new ImageData(imgFrameBuffer, 240, 160)
 }
 // --- Common functions ---
+function base64ToUint8Array(base64) {
+    const binaryString = atob(base64);
+    const data = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        data[i] = binaryString.charCodeAt(i);
+    }
+    return data;
+}
+function uint8ArrayToBase64(uint8Array) {
+    let binaryString = '';
+    for (let i = 0; i < uint8Array.length; i++) {
+        binaryString += String.fromCharCode(uint8Array[i]);
+    }
+    return btoa(binaryString);
+}
 function capture() {
     const image = canvas.toDataURL('image/png');
     const imgElement = document.createElement('img');
