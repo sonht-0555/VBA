@@ -21,6 +21,7 @@ var turboMode = false
 var muteMode = false
 var fastForwardMode = false
 var isSaveSupported = true
+let vkState = 0
 const fileInput = document.getElementById('romFile')
 const canvas = document.getElementById('canvas')
 
@@ -98,21 +99,6 @@ function wasmReady() {
     idata = new ImageData(imgFrameBuffer, 240, 160)
 }
 // --- Common functions ---
-function base64ToUint8Array(base64) {
-    const binaryString = atob(base64);
-    const data = new Uint8Array(binaryString.length);
-    for (let i = 0; i < binaryString.length; i++) {
-        data[i] = binaryString.charCodeAt(i);
-    }
-    return data;
-}
-function uint8ArrayToBase64(uint8Array) {
-    let binaryString = '';
-    for (let i = 0; i < uint8Array.length; i++) {
-        binaryString += String.fromCharCode(uint8Array[i]);
-    }
-    return btoa(binaryString);
-}
 function capture() {
     const image = canvas.toDataURL('image/png');
     const imgElement = document.createElement('img');
@@ -166,36 +152,20 @@ function checkSave() {
     lastCheckedSaveState = state;
 }
 function emuLoop() {
-if (isRunning) {
-    frameCnt++
-    if (frameCnt % 60 == 0) {
-        checkSave();
-    }
-    if (frameCnt % 128 == 0) {
-        if (last128FrameTime) {
-            var diff = performance.now() - last128FrameTime
-            var frameInMs = diff / 128
-            var fps = -1
-            if (frameInMs > 0.001) {
-                fps = 1000 / frameInMs
-            }
-            document.getElementById('fps').textContent = fps
+    if (isRunning) {
+        frameCnt++
+        if (frameCnt % 60 == 0) {
+            checkSave();
+            Module._emuRunFrame(vkState);
         }
-        last128FrameTime = performance.now()
+        drawContext = canvas.getContext('2d');
+        drawContext.putImageData(idata, 0, 0);
     }
-    lastFrameTime = performance.now()
-    Module._emuRunFrame(vkState);
-    console.log(vkState)
-    drawContext = canvas.getContext('2d');
-    drawContext.putImageData(idata, 0, 0);
-}
 }
 function loop() {
     emuLoop();
     window.requestAnimationFrame(loop);
 }
-
-let vkState = 0;
 const keyMask = {
     a: 1,       // 1
     b: 2,       // 2
@@ -207,7 +177,7 @@ const keyMask = {
     down: 128,    // 128
     r: 256,       // 256
     l: 512        // 512
-  };
+};
 function buttonPresss(key) {
   if (keyMask[key]) {
     vkState |= keyMask[key];
@@ -346,7 +316,6 @@ document.addEventListener('contextmenu', function (e) {
 let currentSaveStateInMemory = null;
 const saveButton = document.getElementById('saveStateButton');
 const loadButton = document.getElementById('loadStateButton');
-
 // Hàm ghi dữ liệu vào IndexedDB
 function writeToIndexedDB(filePart, data) {
     const request = indexedDB.open('/data');
@@ -357,7 +326,6 @@ function writeToIndexedDB(filePart, data) {
         store.put(data, filePart);
     };
 }
-
 // Hàm đọc dữ liệu từ IndexedDB
 function readFromIndexedDB(filePart) {
     return new Promise((resolve) => {
@@ -371,7 +339,6 @@ function readFromIndexedDB(filePart) {
         };
     });
 }
-
 // Sử dụng các hàm trên cho saveButton và loadButton
 saveButton.addEventListener('click', function() {
     const saveStateBufferPtr = Module._malloc(2000000);
@@ -380,7 +347,6 @@ saveButton.addEventListener('click', function() {
     Module._free(saveStateBufferPtr);
     writeToIndexedDB('/data/states/game.ss1', saveStateDataCopy);
 });
-
 loadButton.addEventListener('click', async function() {
     const saveStateData = await readFromIndexedDB('/data/states/game.ss1');
     const dataSize = saveStateData.length;
@@ -394,14 +360,14 @@ function loadfile() {
         const db = e.target.result;
         const range = IDBKeyRange.bound('/data/states/', '/data/states/' + '\uffff');
         db.transaction('FILE_DATA', 'readonly').objectStore('FILE_DATA').openCursor(range).onsuccess = (e) => {
-          const cursor = e.target.result;
-          if (cursor) {
-            const key = cursor.key;
-            console.log(key.substring(key.lastIndexOf('/') + 1));
-            cursor.continue();
-          }
+            const cursor = e.target.result;
+            if (cursor) {
+                const key = cursor.key;
+                console.log(key.substring(key.lastIndexOf('/') + 1));
+                cursor.continue();
+            }
         };
-      };
+    };
 }
 function create() {
     const request = indexedDB.open('/data', 1); // Tạo hoặc mở cơ sở dữ liệu với version 1
