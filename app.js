@@ -3,24 +3,15 @@ const AUDIO_BLOCK_SIZE = 1024
 const AUDIO_FIFO_MAXLEN = 4900
 var audioFifo0 = new Int16Array(AUDIO_FIFO_MAXLEN)
 var audioFifo1 = new Int16Array(AUDIO_FIFO_MAXLEN)
-var canvasVba = null
 var romBuffer = -1
 var isRunning = false
 const wasmSaveBufLen = 0x20000 + 0x2000
 var tmpSaveBuf = new Uint8Array(wasmSaveBufLen)
-var frameCnt = 0
-var last128FrameTime = 0
-var lastFrameTime = 0
-var frameSkip = 0
 var audioFifoHead = 0
 var audioFifoCnt = 0
 var lastCheckedSaveState = 0
-var turboInterval = -1
-var lowLatencyMode = false
-var turboMode = false
 var muteMode = false
 var fastForwardMode = false
-var isSaveSupported = true
 let vkState = 0
 const fileInput = document.getElementById('romFile')
 const canvas = document.getElementById('canvas')
@@ -168,11 +159,8 @@ function checkSave() {
 }
 function emuLoop() {
     if (isRunning) {
-        frameCnt++
-        if (frameCnt % 60 == 0) {
-            checkSave();
-            Module._emuRunFrame(vkState);
-        }
+        checkSave();
+        Module._emuRunFrame(vkState);
         drawContext = canvas.getContext('2d');
         drawContext.putImageData(idata, 0, 0);
     }
@@ -307,13 +295,11 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 });
-
 document.addEventListener('touchstart', function preventZoom(e) {
     if (e.touches.length > 1) {
         e.preventDefault(); // Ngăn pinch zoom
     }
 }, { passive: false });
-
 let lastTouchEnd = 0;
 document.addEventListener('touchend', function preventDoubleTapZoom(e) {
     const now = new Date().getTime();
@@ -322,8 +308,6 @@ document.addEventListener('touchend', function preventDoubleTapZoom(e) {
     }
     lastTouchEnd = now;
 }, false);
-
-// Ngăn kính lúp trên iOS khi giữ lâu (dùng contextmenu)
 document.addEventListener('contextmenu', function (e) {
     e.preventDefault();
 });
@@ -384,18 +368,4 @@ function loadfile() {
         };
     };
 }
-function create() {
-    const request = indexedDB.open('/data', 1); // Tạo hoặc mở cơ sở dữ liệu với version 1
-
-    request.onupgradeneeded = (e) => {
-        const db = e.target.result;
-        if (!db.objectStoreNames.contains('FILE_DATA')) {
-            db.createObjectStore('FILE_DATA'); // Tạo object store nếu chưa tồn tại
-        }
-    };
-    request.onerror = (err) => {
-        console.error('Error opening IndexedDB:', err);
-    };
-}
-create();
 //----------------------------------------------------------------------------------------------------------------------
